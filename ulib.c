@@ -126,18 +126,18 @@ thread_join()
 
 int lock_init(mutexlock *lk)
 {
-  lk->flag = 0;
+  lk->locked = 0;
   return 0;
 }
 
 void lock_acquire(mutexlock *lk){
-  while(xchg(&lk->flag, 1) != 0);
+  while(xchg(&lk->locked, 1) != 0);
   __sync_synchronize();
 
 }
 
 void lock_release(mutexlock *lk){
-	xchg(&lk->flag, 0);
+	xchg(&lk->locked, 0);
   __sync_synchronize();
 
 }

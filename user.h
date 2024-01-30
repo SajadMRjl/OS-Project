@@ -1,5 +1,7 @@
-#include "mutexlock.h"
-
+// Mutual exclusion lock.
+typedef struct __lock {
+  uint locked;       // Is the lock held?
+} mutexlock;
 struct stat;
 struct rtcdate;
 
