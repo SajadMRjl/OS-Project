@@ -3,6 +3,7 @@
 #include "fcntl.h"
 #include "user.h"
 #include "x86.h"
+#include "mmu.h"
 
 char*
 strcpy(char *s, const char *t)
@@ -103,4 +104,19 @@ memmove(void *vdst, const void *vsrc, int n)
   while(n-- > 0)
     *dst++ = *src++;
   return vdst;
+}
+
+
+int
+thread_create(void(*worker)(void*, void*), void* argc, void* argv)
+{
+  void* stack;
+  stack = malloc(PGSIZE);
+  return clone(worker, argc, argv, stack);
+}
+
+int
+thread_join()
+{
+  return join();
 }
