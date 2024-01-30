@@ -2,6 +2,4 @@
 struct mutexlock {
   uint locked;       // Is the lock held?
 
-
 };
-
