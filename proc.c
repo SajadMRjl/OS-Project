@@ -559,7 +559,7 @@ clone(void(*func)(void*, void*), void* argc, void* argv, void* stack)
   *(uint*)(ssize -  3 * sizeof(void*)) = (uint)argv; // push argv into stack    
   
   
-  np->tf->ebp = stack; // base stack address
+  np->tf->ebp = (uint)stack; // base stack address
   np->tf->esp = (uint)ssize -  3 * sizeof(void*); // stack pointer
   np->tf->eip = (uint)func;
 
@@ -604,7 +604,7 @@ join(void)
       havekids = 1;
       if(p->state == ZOMBIE){
         // Found one.
-        pid = p->pid;
+        int pid = p->pid;
         kfree(p->kstack);
         p->kstack = 0;
         freevm(p->pgdir);
