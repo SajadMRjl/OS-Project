@@ -4,6 +4,8 @@
 #include "user.h"
 #include "x86.h"
 #include "mmu.h"
+#include "mutexlock.h"
+
 
 char*
 strcpy(char *s, const char *t)
@@ -119,4 +121,23 @@ int
 thread_join()
 {
   return join();
+}
+
+
+int lock_init(mutexlock *lk)
+{
+  lk->flag = 0;
+  return 0;
+}
+
+void lock_acquire(mutexlock *lk){
+  while(xchg(&lk->flag, 1) != 0);
+  __sync_synchronize();
+
+}
+
+void lock_release(mutexlock *lk){
+	xchg(&lk->flag, 0);
+  __sync_synchronize();
+
 }
