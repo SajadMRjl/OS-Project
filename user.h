@@ -44,7 +44,7 @@ void* malloc(uint);
 void free(void*);
 int atoi(const char*);
 int thread_create(void(*worker)(void*, void*), void*, void*);
-int thread_join();
+int thread_join(void);
 int lock_init(mutexlock *lk);
 void lock_acquire(mutexlock *lk);
 void lock_release(mutexlock *lk);

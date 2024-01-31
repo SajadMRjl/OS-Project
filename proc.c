@@ -553,14 +553,15 @@ clone(void(*func)(void*, void*), void* argc, void* argv, void* stack)
 
   // initialite stack
 
-  void* ssize = stack + PGSIZE * sizeof(void*);
+  uint ssize = (uint)stack + PGSIZE;
   *(uint*)(ssize -  3 * sizeof(void*)) = 0xFFFFFFF; // push return address into stack    
   *(uint*)(ssize -  2 * sizeof(void*)) = (uint)argc; // push argc into stack    
-  *(uint*)(ssize -  3 * sizeof(void*)) = (uint)argv; // push argv into stack    
+  *(uint*)(ssize -  1 * sizeof(void*)) = (uint)argv; // push argv into stack    
   
-  
-  np->tf->ebp = (uint)stack; // base stack address
+
+
   np->tf->esp = (uint)ssize -  3 * sizeof(void*); // stack pointer
+  np->tf->ebp = np->tf->esp; // base stack address
   np->tf->eip = (uint)func;
 
 
@@ -583,6 +584,9 @@ clone(void(*func)(void*, void*), void* argc, void* argv, void* stack)
 
   release(&ptable.lock);
 
+    cprintf("pid %d created\n", pid);
+
+
   return pid;
 }
 
@@ -603,11 +607,11 @@ join(void)
         continue;
       havekids = 1;
       if(p->state == ZOMBIE){
+        cprintf("pid %d killed\n", p->pid);
         // Found one.
-        int pid = p->pid;
+        pid = p->pid;
         kfree(p->kstack);
         p->kstack = 0;
-        freevm(p->pgdir);
         p->pid = 0;
         p->parent = 0;
         p->name[0] = 0;
