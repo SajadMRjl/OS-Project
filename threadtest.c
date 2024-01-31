@@ -17,21 +17,51 @@ void f1(void* argc, void* argv){
     exit();
 }
 
+mutexlock lock;
+int rsl;
+int cnt;
+int op1 = 1;
+int op2 = -1;
 
+void f2(void *arg1, void *arg2)
+{
+    int cnt = *(int *)arg1;
+    int op = *(int *)arg2;
+    for (int i = 0; i < cnt; i++)
+    {
+        lock_acquire(&lock);
+        rsl += op;
+        lock_release(&lock);
+    }
+    exit();
+}
 
-
-
-int main(){
+int main()
+{
     int data[] = {1,2,3};
     int argc = 1;
     int pid = thread_create(&f1, (void*)&argc, (void*)data);
     thread_join();
 
     if (pid < 0)
-        printf("test 1 fail\n");
+        printf(1, "test 1 fail\n");
     else
-        printf("test 1 succeed\n");
+        printf(1, "test 1 succeed\n");
     
+    rsl = 0;
+    cnt = 1000;
+    lock_init(&lock);
+    thread_create(&f2, (void *)&cnt, (void *)&op1);
+    thread_create(&f2, (void *)&cnt, (void *)&op2);
+
+    thread_join();
+    thread_join();
+
+    if (rsl != 0)
+        printf(1, "test 2 fail\n");
+    else
+        printf(1, "test 2 succeed\n");
     
-    return 0;
+
+    exit();
 }
