@@ -1,3 +1,7 @@
+// Mutual exclusion lock.
+typedef struct __lock {
+  uint locked;       // Is the lock held?
+} mutexlock;
 struct stat;
 struct rtcdate;
 
@@ -23,6 +27,8 @@ int getpid(void);
 char* sbrk(int);
 int sleep(int);
 int uptime(void);
+int clone(void(*worker)(void*, void*), void*, void*, void*);
+int join(void);
 
 // ulib.c
 int stat(const char*, struct stat*);
@@ -37,3 +43,8 @@ void* memset(void*, int, uint);
 void* malloc(uint);
 void free(void*);
 int atoi(const char*);
+int thread_create(void(*worker)(void*, void*), void*, void*);
+int thread_join(void);
+int lock_init(mutexlock *lk);
+void lock_acquire(mutexlock *lk);
+void lock_release(mutexlock *lk);

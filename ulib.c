@@ -3,6 +3,8 @@
 #include "fcntl.h"
 #include "user.h"
 #include "x86.h"
+#include "mmu.h"
+
 
 char*
 strcpy(char *s, const char *t)
@@ -103,4 +105,38 @@ memmove(void *vdst, const void *vsrc, int n)
   while(n-- > 0)
     *dst++ = *src++;
   return vdst;
+}
+
+
+int
+thread_create(void(*worker)(void*, void*), void* argc, void* argv)
+{
+  void* stack;
+  stack = malloc(PGSIZE);
+  return clone(worker, argc, argv, stack);
+}
+
+int
+thread_join()
+{
+  return join();
+}
+
+
+int lock_init(mutexlock *lk)
+{
+  lk->locked = 0;
+  return 0;
+}
+
+void lock_acquire(mutexlock *lk){
+  while(xchg(&lk->locked, 1) != 0);
+  __sync_synchronize();
+
+}
+
+void lock_release(mutexlock *lk){
+	xchg(&lk->locked, 0);
+  __sync_synchronize();
+
 }
